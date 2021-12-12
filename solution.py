@@ -78,7 +78,6 @@ def get_route(hostname):
     alltraces = []  # This is your list to contain all traces
 
     for ttl in range(1, MAX_HOPS):
-        print(alltraces)
         thistrace = list()
         thistrace.append(str(ttl))
         for tries in range(TRIES):
@@ -97,7 +96,6 @@ def get_route(hostname):
                 whatReady = select.select([mySocket], [], [], timeLeft)
                 howLongInSelect = (time.time() - startedSelect)
                 if whatReady[0] == []:
-                    print('1')# Timeout
                     thistrace.append("*")
                     thistrace.append("Request timed out.")
                     # You should add the list above to your all traces list
@@ -108,18 +106,15 @@ def get_route(hostname):
                 rtt = str(round((timeReceived - startedSelect) * 1000, 0)) + "ms"
                 timeLeft = timeLeft - howLongInSelect
                 if timeLeft <= 0:
-                    print("2")
                     thistrace.append("*")
                     thistrace.append("Request timed out.")
                     # You should add the list above to your all traces list
                     alltraces.append(thistrace)
                     continue
             except timeout:
-                print("timeout")
                 continue
 
             else:
-                print('3')
                 # Fetch the icmp type from the IP packet
                 typeData = recvPacket[20:21]
                 types = struct.unpack("b", typeData)[0]
@@ -130,7 +125,6 @@ def get_route(hostname):
                 except herror:  # if the host does not provide a hostname
                     hostName = "hostname not returnable"
                 if types == 11:
-                    print("type 11")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 +
                                                                 bytes])[0]
@@ -140,7 +134,6 @@ def get_route(hostname):
                     alltraces.append(thistrace)
                     continue
                 elif types == 3:
-                    print("Type 3")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     thistrace.append("*")
@@ -148,18 +141,15 @@ def get_route(hostname):
                     alltraces.append(thistrace)
                     return alltraces
                 elif types == 0:
-                    print("type 0")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     thistrace.append(rtt)
                     thistrace.append(hostIP)
                     thistrace.append(hostName)
                     alltraces.append(thistrace)
-                    print(alltraces)
                     return alltraces
                 else:
-                    print(types)
-
+                    pass
                     # Fill in start
                     # If there is an exception/error to your if statements, you should append that to your list here
                     # Fill in end
