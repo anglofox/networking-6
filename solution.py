@@ -79,8 +79,8 @@ def get_route(hostname):
 
     for ttl in range(1, MAX_HOPS):
         print(alltraces)
-        thistrace = []
-        thistrace.append(ttl)
+        thistrace = list()
+        thistrace.append(str(ttl))
         for tries in range(TRIES):
             destAddr = gethostbyname(hostname)
             # Make a raw socket named mySocket
@@ -105,7 +105,7 @@ def get_route(hostname):
                     continue
                 recvPacket, addr = mySocket.recvfrom(1024)
                 timeReceived = time.time()
-                rtt = str(round((timeReceived - startedSelect) * 1000, 0))
+                rtt = str(round((timeReceived - startedSelect) * 1000, 0)) + "ms"
                 timeLeft = timeLeft - howLongInSelect
                 if timeLeft <= 0:
                     print("2")
@@ -122,7 +122,7 @@ def get_route(hostname):
                 print('3')
                 # Fetch the icmp type from the IP packet
                 typeData = recvPacket[20:21]
-                types = struct.unpack("b", typeData)
+                types = struct.unpack("b", typeData)[0]
                 hostData = recvPacket[12:16]
                 hostIP = str(ipaddress.IPv4Address(hostData))
                 try:  # try to fetch the hostname
@@ -136,7 +136,7 @@ def get_route(hostname):
                                                                 bytes])[0]
                     thistrace.append(rtt)
                     thistrace.append(hostIP)
-                    this.trace.append(hostName)
+                    thistrace.append(hostName)
                     alltraces.append(thistrace)
                     continue
                 elif types == 3:
@@ -153,12 +153,12 @@ def get_route(hostname):
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     thistrace.append(rtt)
                     thistrace.append(hostIP)
-                    this.trace.append(hostName)
+                    thistrace.append(hostName)
                     alltraces.append(thistrace)
                     print(alltraces)
                     return alltraces
                 else:
-                    print('here')
+                    print(types)
 
                     # Fill in start
                     # If there is an exception/error to your if statements, you should append that to your list here
